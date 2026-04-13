@@ -1,31 +1,33 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
-import { Link, useNavigate } from "react-router-dom";
-
-// Navbar handles navigation + login state + admin visibility
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Check if user is logged in
+  const fetchUser = async () => {
+    try {
+      const res = await api.get("/auth/auth");
+      setUser(res.data);
+    } catch {
+      setUser(null);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/auth/auth");
-        setUser(res.data);
-      } catch (err) {
-        setUser(null);
-      }
-    };
-
     fetchUser();
-  }, []);
+  }, [location]); 
 
-  // Logout function
   const logout = async () => {
-    await api.delete("/auth/logout");
+    try {
+      await api.delete("/auth/logout");
+    } catch (err) {
+      console.log("Logout error");
+    }
+
     setUser(null);
     navigate("/login");
   };
@@ -46,14 +48,11 @@ export default function Navbar() {
         <>
           <Link to="/bookings">Bookings</Link>
 
-          {/* Admin-only link */}
-          {user.role === "admin" && (
+          {user?.role === "admin" && (
             <Link to="/admin">Admin</Link>
           )}
 
-          <button onClick={logout}>
-            Logout
-          </button>
+          <button onClick={logout}>Logout</button>
         </>
       )}
 

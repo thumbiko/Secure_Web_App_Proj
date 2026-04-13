@@ -1,7 +1,10 @@
+// controllers/authController.js
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
+// =====================
 // REGISTER
+// =====================
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -25,7 +28,9 @@ exports.register = async (req, res) => {
   }
 };
 
+// =====================
 // LOGIN
+// =====================
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -36,13 +41,58 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ msg: "Invalid credentials" });
 
+    // Store user info in session
     req.session.user = {
-      id: user._id,
+      id:   user._id,
+      name: user.name,   // added — getMe and Navbar need this
+      email: user.email, // added — good practice to have available
       role: user.role
     };
 
-    res.json({ msg: "Login successful", role: user.role });
+    // Return user object so AuthContext can update immediately
+    res.json({
+      msg: "Login successful",
+      user: {
+        _id:   user._id,
+        name:  user.name,
+        email: user.email,
+        role:  user.role
+      }
+    });
   } catch (err) {
     res.status(500).json({ msg: "Server error" });
   }
+};
+
+// =====================
+// GET ME (session check)
+// =====================
+exports.getMe = async (req, res) => {
+  // Uses req.session.user — consistent with login above
+  if (!req.session.user) {
+    return res.status(401).json({ msg: "Not authenticated" });
+  }
+
+  try {
+    const user = await User.findById(req.session.user.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ msg: "User not found" });
+    }
+    res.json(user); // returns { _id, name, email, role }
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+// =====================
+// LOGOUT
+// =====================
+exports.logout = (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ msg: "Logout failed" });
+    }
+    res.clearCookie("connect.sid");
+    res.json({ msg: "Logged out successfully" });
+  });
 };

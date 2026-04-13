@@ -1,5 +1,5 @@
 // Check if user is logged in
-exports.requireAuth = (req, res, next) => {
+exports.requireLogin = (req, res, next) => {
   if (!req.session.user) {
     return res.status(401).send("Unauthorized");
   }

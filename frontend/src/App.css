@@ -1,50 +1,38 @@
-/* MAIN APP WRAPPER */
+body {
+  margin: 0;
+  background-color: #f9fafb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .App {
   text-align: center;
   padding: 20px;
 }
 
-/* CARD STYLE (BOOKINGS / ADMIN) */
 .card {
   background-color: white;
-  padding: 15px;
-  margin: 12px auto;
-  border-radius: 12px;
-  width: 320px;
-
+  padding: 18px;
+  margin: 16px auto;
+  border-radius: 14px;
+  width: 340px;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
 }
 
-/* NAVBAR */
+.card:hover {
+  transform: translateY(-3px);
+}
+
 .MainNav {
   background-color: #ffffff;
-  padding: 12px;
+  padding: 12px 20px;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* OPTIONAL IMAGE STYLE */
-.myCara {
-  height: 80px;
-  width: auto;
-}
-
-/* NAVBAR CONTAINER */
-.MainNav {
-  background-color: #ffffff;
-  padding: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-
-  border-bottom: 1px solid #e5e7eb;
-}
-
-/* LINKS */
 .MainNav a {
   text-decoration: none;
   color: #111827;
@@ -58,16 +46,32 @@
   color: white;
 }
 
-/* LOGOUT BUTTON */
 .MainNav button {
   background-color: #ef4444;
   color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
 .MainNav button:hover {
   background-color: #dc2626;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+input {
+  padding: 10px;
+  margin: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 250px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #00bfff;
 }
