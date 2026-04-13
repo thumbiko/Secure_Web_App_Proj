@@ -32,3 +32,42 @@
   height: 80px;
   width: auto;
 }
+
+/* NAVBAR CONTAINER */
+.MainNav {
+  background-color: #ffffff;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* LINKS */
+.MainNav a {
+  text-decoration: none;
+  color: #111827;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.MainNav a:hover {
+  background-color: #00bfff;
+  color: white;
+}
+
+/* LOGOUT BUTTON */
+.MainNav button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.MainNav button:hover {
+  background-color: #dc2626;
+}
