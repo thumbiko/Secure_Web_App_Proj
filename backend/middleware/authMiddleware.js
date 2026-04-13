@@ -1,15 +1,19 @@
-// Check if user is logged in
-exports.requireLogin = (req, res, next) => {
-  if (!req.session.user) {
-    return res.status(401).send("Unauthorized");
+// middleware/authMiddleware.js
+
+// Blocks unauthenticated requests — 401 = not logged in
+const isAuthenticated = (req, res, next) => {
+  if (req.session && req.session.user) {
+    return next();
   }
-  next();
+  return res.status(401).json({ msg: "Unauthorised — please log in" });
 };
 
-// Check if user is admin
-exports.requireAdmin = (req, res, next) => {
-  if (!req.session.user || req.session.user.role !== "admin") {
-    return res.status(403).send("Forbidden: Admins only");
+// Blocks non-admin requests — 403 = logged in but not permitted
+const isAdmin = (req, res, next) => {
+  if (req.session && req.session.user && req.session.user.role === "admin") {
+    return next();
   }
-  next();
+  return res.status(403).json({ msg: "Forbidden — admin only" });
 };
+
+module.exports = { isAuthenticated, isAdmin };
