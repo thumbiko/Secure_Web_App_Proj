@@ -1,32 +1,45 @@
 // server.js
-require("dotenv").config(); // must be the very first line
+require("dotenv").config();
 
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const session = require("express-session");
+const express        = require("express");
+const mongoose       = require("mongoose");
+const cors           = require("cors");
+const session        = require("express-session");
+const mongoSanitize  = require("express-mongo-sanitize"); // ADD
+const rateLimit      = require("express-rate-limit");     // ADD
 
 const app = express();
 
 // =====================
+// RATE LIMITER — auth endpoints only
+// =====================
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,                   // max 10 attempts per IP per window
+  message: { msg: "Too many attempts, please try again later" }
+});
+
+// =====================
 // MIDDLEWARE
 // =====================
-app.use(express.json());
+app.use(express.json({ limit: "10kb" })); // body size cap — DoS prevention
 
 app.use(cors({
   origin: "http://localhost:3000",
-  credentials: true  // allows cookies cross-origin
+  credentials: true
 }));
+
+app.use(mongoSanitize()); // strips $ and . from req.body — NoSQL injection prevention
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,   // JS cannot read this cookie — blocks XSS theft
-    secure: false,    // set to true in production (requires HTTPS)
-    sameSite: "lax",  // prevents CSRF while allowing normal navigation
-    maxAge: 1000 * 60 * 60 * 2  // 2 hours
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 1000 * 60 * 60 * 2
   }
 }));
 
@@ -44,7 +57,8 @@ const authRoutes    = require("./routes/authRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 
-app.use("/api/auth",     authRoutes);
+// Apply rate limiter to auth routes only
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
 
@@ -54,7 +68,7 @@ app.use("/api/services", serviceRoutes);
 app.use((err, req, res, next) => {
   console.error(`[ERROR] ${req.method} ${req.url} —`, err.message);
   res.status(err.statusCode || 500).json({
-    message: process.env.NODE_ENV === "production"
+    msg: process.env.NODE_ENV === "production"
       ? "Something went wrong"
       : err.message
   });
