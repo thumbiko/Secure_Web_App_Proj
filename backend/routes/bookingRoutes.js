@@ -14,19 +14,11 @@ const {
 } = require("../middleware/authMiddleware");
 
 // USER ROUTES
-
-// Create a booking (must be logged in)
 router.post("/", requireLogin, createBooking);
-
-// Get ONLY my bookings
 router.get("/my", requireLogin, getUserBookings);
 
 // ADMIN ROUTES
-
-// View all bookings
-router.get("/all", requireAdmin, getAllBookings);
-
-// Delete any booking
-router.delete("/:id", requireAdmin, deleteBooking);
+router.get("/all", requireLogin, requireAdmin, getAllBookings);
+router.delete("/:id", requireLogin, requireAdmin, deleteBooking);
 
 module.exports = router;

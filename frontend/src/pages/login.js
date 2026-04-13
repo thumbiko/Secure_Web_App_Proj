@@ -1,22 +1,26 @@
 import { useState } from "react";
 import api from "../api/api";
-
-// login page for users
-// Sends credentials to backend and creates session
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate(); 
+
   const handleLogin = async () => {
     try {
-      const res = await api.post("/auth/login", {
+      await api.post("/auth/login", {
         email,
         password
       });
 
-      alert(res.data.msg);
+      alert("Login successful");
+
+     
+      navigate("/bookings");
+
     } catch (err) {
       alert("Login failed");
     }
