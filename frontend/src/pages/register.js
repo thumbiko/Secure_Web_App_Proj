@@ -1,42 +1,57 @@
+// src/pages/Register.js
 import { useState } from "react";
 import api from "../api/api";
-
-// Register page
-// Creates and stores new user in db
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
+  const [form, setForm]   = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleRegister = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (form.password.length < 8) {
+      return setError("Password must be at least 8 characters");
+    }
+
     try {
-      await api.post("/auth/register", {
-        name,
-        email,
-        password
-      });
-
-      alert("User registered successfully");
-      window.location.href = "/login";
-
+      await api.post("/auth/register", form);
+      navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      setError(err.response?.data?.msg || "Registration failed");
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-
-      <input placeholder="Name" onChange={(e) => setName(e.target.value)} />
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-      <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
-
-      <button onClick={handleRegister}>
-        Register
-      </button>
+    <div style={{ maxWidth: "400px", margin: "80px auto", padding: "0 20px" }}>
+      <h2>Create Account</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        {[
+          { label: "Name",     name: "name",     type: "text",     placeholder: "Your name" },
+          { label: "Email",    name: "email",    type: "email",    placeholder: "you@example.com" },
+          { label: "Password", name: "password", type: "password", placeholder: "Min 8 characters" }
+        ].map(f => (
+          <div key={f.name} style={{ marginBottom: "14px" }}>
+            <label>{f.label}</label><br />
+            <input name={f.name} type={f.type} placeholder={f.placeholder}
+              value={form[f.name]} onChange={handleChange} required
+              style={{ width: "100%", padding: "8px", marginTop: "4px" }} />
+          </div>
+        ))}
+        <button type="submit"
+          style={{ width: "100%", padding: "10px", background: "#111", color: "#fff",
+            border: "none", borderRadius: "6px", cursor: "pointer" }}>
+          Register
+        </button>
+      </form>
+      <p style={{ marginTop: "16px", fontSize: "0.9rem" }}>
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
     </div>
   );
 }
