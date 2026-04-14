@@ -1,21 +1,14 @@
+// routes/serviceRoutes.js
 const express = require("express");
 const router = express.Router();
 
-const {
-  getServices,
-  createService
-} = require("../controllers/serviceController");
+const { getServices, createService } = require("../controllers/serviceController");
+const { isAuthenticated, isAdmin }   = require("../middleware/authMiddleware");
 
+// PUBLIC — logged-in users can view services
+router.get("/", isAuthenticated, getServices);
 
-const {
-  requireLogin,
-  requireAdmin
-} = require("../middleware/authMiddleware");
-
-// PUBLIC (logged-in users only)
-router.get("/", requireLogin, getServices);
-
-// ADMIN ONLY
-router.post("/", requireAdmin, createService);
+// ADMIN ONLY — create new service
+router.post("/", isAuthenticated, isAdmin, createService);
 
 module.exports = router;

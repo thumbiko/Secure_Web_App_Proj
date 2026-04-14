@@ -16,4 +16,9 @@ const isAdmin = (req, res, next) => {
   return res.status(403).json({ msg: "Forbidden — admin only" });
 };
 
-module.exports = { isAuthenticated, isAdmin };
+module.exports = {
+  isAuthenticated,
+  isAdmin,
+  requireLogin: isAuthenticated, // alias — keeps serviceRoutes.js working
+  requireAdmin: isAdmin          // alias — keeps serviceRoutes.js working
+};

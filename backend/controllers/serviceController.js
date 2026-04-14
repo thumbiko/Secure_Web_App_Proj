@@ -1,17 +1,22 @@
+// controllers/serviceController.js
 const Service = require("../models/Service");
 
-// Get all services (visible to users)
+// GET all services — visible to logged-in users
 exports.getServices = async (req, res) => {
-  const services = await Service.find();
-  res.json(services);
+  try {
+    const services = await Service.find();
+    res.json(services);
+  } catch (err) {
+    res.status(500).json({ msg: "Could not retrieve services" });
+  }
 };
 
-// Admin creates new services
+// POST create service — admin only
 exports.createService = async (req, res) => {
-  const service = await Service.create(req.body);
-
-  res.status(201).json({
-    msg: "Service created",
-    service
-  });
+  try {
+    const service = await Service.create(req.body);
+    res.status(201).json({ msg: "Service created", service });
+  } catch (err) {
+    res.status(500).json({ msg: "Could not create service" });
+  }
 };
