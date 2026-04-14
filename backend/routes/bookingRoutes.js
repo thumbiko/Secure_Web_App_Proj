@@ -13,14 +13,17 @@ const {
 
 const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
 
-// USER ROUTES — require login
+// USER ROUTES
 router.post("/",      isAuthenticated, createBooking);
 router.get("/",       isAuthenticated, getMyBookings);
 router.delete("/:id", isAuthenticated, deleteBooking);
 
-// ADMIN ROUTES — require login + admin role
-router.get("/admin/all",      isAuthenticated, isAdmin, getAllBookings);
-router.patch("/admin/:id",    isAuthenticated, isAdmin, updateBookingStatus);
-router.delete("/admin/:id",   isAuthenticated, isAdmin, adminDeleteBooking);
+// ADMIN ROUTES
+router.get("/admin/all",    isAuthenticated, isAdmin, getAllBookings);
+router.patch("/admin/:id",  isAuthenticated, isAdmin, updateBookingStatus);
+router.delete("/admin/:id", isAuthenticated, isAdmin, adminDeleteBooking);
+
+// ✅ NEW — ADMIN CREATE BOOKING FOR ANY USER
+router.post("/admin/create", isAuthenticated, isAdmin, createBooking);
 
 module.exports = router;
