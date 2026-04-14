@@ -3,14 +3,26 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './context/AuthContext'; // ADD THIS
+import { AuthProvider } from './context/AuthContext';
+
+// Suppress ResizeObserver browser noise — not a real error
+window.addEventListener('error', (e) => {
+  if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+    e.stopImmediatePropagation();
+  }
+});
+const resizeObserverErr = window.onerror;
+window.onerror = (msg, ...args) => {
+  if (msg.includes('ResizeObserver')) return true;
+  return resizeObserverErr?.(...args);
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthProvider> {/* ADD THIS */}
+    <AuthProvider>
       <App />
-    </AuthProvider> {/* ADD THIS */}
+    </AuthProvider>
   </React.StrictMode>
 );
 
