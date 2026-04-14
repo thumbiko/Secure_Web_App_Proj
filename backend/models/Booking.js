@@ -1,28 +1,33 @@
 const mongoose = require("mongoose");
 
 const BookingSchema = new mongoose.Schema({
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
   },
 
-  serviceType: {
+  service: {
     type: String,
-    enum: [
-      "VALET",
-      "STEREO",
-      "LIGHTING",
-      "CARPLAY",
-      "DIAGNOSTICS",
-      "AMBIENT_LIGHTING",
-      "STARC_LIGHTS"
-    ],
     required: true
   },
 
-  vehicleModel: {
+  carMake: {
     type: String,
+    required: true
+  },
+
+  carModel: {
+    type: String,
+    required: true
+  },
+
+  carYear: {
+    type: Number
+  },
+
+  date: {
+    type: Date,
     required: true
   },
 
@@ -33,7 +38,7 @@ const BookingSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["pending", "confirmed", "completed"],
+    enum: ["pending", "confirmed", "completed", "cancelled"],
     default: "pending"
   }
 }, { timestamps: true });
