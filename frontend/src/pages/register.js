@@ -4,19 +4,16 @@ import api from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
-  const [form, setForm]   = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (form.password.length < 8) {
-      return setError("Password must be at least 8 characters");
-    }
 
     try {
       await api.post("/auth/register", form);
@@ -27,31 +24,45 @@ export default function Register() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "80px auto", padding: "0 20px" }}>
-      <h2>Create Account</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        {[
-          { label: "Name",     name: "name",     type: "text",     placeholder: "Your name" },
-          { label: "Email",    name: "email",    type: "email",    placeholder: "you@example.com" },
-          { label: "Password", name: "password", type: "password", placeholder: "Min 8 characters" }
-        ].map(f => (
-          <div key={f.name} style={{ marginBottom: "14px" }}>
-            <label>{f.label}</label><br />
-            <input name={f.name} type={f.type} placeholder={f.placeholder}
-              value={form[f.name]} onChange={handleChange} required
-              style={{ width: "100%", padding: "8px", marginTop: "4px" }} />
-          </div>
-        ))}
-        <button type="submit"
-          style={{ width: "100%", padding: "10px", background: "#111", color: "#fff",
-            border: "none", borderRadius: "6px", cursor: "pointer" }}>
-          Register
-        </button>
-      </form>
-      <p style={{ marginTop: "16px", fontSize: "0.9rem" }}>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card shadow p-4 w-100" style={{ maxWidth: "420px" }}>
+        <h3 className="text-center mb-3">Create Account</h3>
+
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <input
+            className="form-control mb-3"
+            name="name"
+            placeholder="Name"
+            onChange={handleChange}
+          />
+
+          <input
+            className="form-control mb-3"
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+          />
+
+          <input
+            className="form-control mb-3"
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={handleChange}
+          />
+
+          <button className="btn btn-dark w-100" type="submit">
+            Register
+          </button>
+        </form>
+
+        <p className="text-center mt-3 mb-0 small">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
     </div>
   );
 }

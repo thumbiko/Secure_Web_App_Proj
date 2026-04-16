@@ -5,9 +5,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const [email,    setEmail]    = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error,    setError]    = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -24,33 +24,40 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "80px auto", padding: "0 20px" }}>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card shadow p-4 w-100" style={{ maxWidth: "420px" }}>
+        <h3 className="text-center mb-3">Login</h3>
 
-      <div style={{ marginBottom: "14px" }}>
-        <label>Email</label><br />
-        <input type="email" placeholder="you@example.com"
-          onChange={e => setEmail(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginTop: "4px" }} />
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="you@example.com"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Password</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button className="btn btn-dark w-100" onClick={handleLogin}>
+          Login
+        </button>
+
+        <p className="text-center mt-3 mb-0 small">
+          No account? <Link to="/register">Register</Link>
+        </p>
       </div>
-
-      <div style={{ marginBottom: "14px" }}>
-        <label>Password</label><br />
-        <input type="password" placeholder="Password"
-          onChange={e => setPassword(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginTop: "4px" }} />
-      </div>
-
-      <button onClick={handleLogin}
-        style={{ width: "100%", padding: "10px", background: "#111", color: "#fff",
-          border: "none", borderRadius: "6px", cursor: "pointer" }}>
-        Login
-      </button>
-
-      <p style={{ marginTop: "16px", fontSize: "0.9rem" }}>
-        No account? <Link to="/register">Register here</Link>
-      </p>
     </div>
   );
 }

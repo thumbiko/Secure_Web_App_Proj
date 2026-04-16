@@ -1,3 +1,4 @@
+// src/pages/AdminDashboard.js
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
@@ -11,6 +12,21 @@ const SERVICE_LABELS = {
 };
 
 const STATUS_OPTIONS = ["pending", "confirmed", "completed", "cancelled"];
+
+const CAR_MAKES = ["BMW", "Toyota", "Volkswagen", "Audi", "Ford", "Tesla"];
+
+const CAR_MODELS = {
+  BMW: ["1 Series", "3 Series", "5 Series", "X3", "X5"],
+  Toyota: ["Corolla", "Yaris", "RAV4"],
+  Volkswagen: ["Golf", "Polo", "Passat"],
+  Audi: ["A3", "A4", "Q5"],
+  Ford: ["Focus", "Puma"],
+  Tesla: ["Model 3", "Model Y"]
+};
+
+const CAR_YEARS = Array.from({ length: 30 }, (_, i) =>
+  String(new Date().getFullYear() - i)
+);
 
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState([]);
@@ -28,7 +44,6 @@ export default function AdminDashboard() {
     notes: ""
   });
 
-  // FETCH BOOKINGS
   const fetchBookings = async () => {
     try {
       const res = await api.get("/bookings/admin/all");
@@ -38,7 +53,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // FETCH USERS
   const fetchUsers = async () => {
     try {
       const res = await api.get("/auth/users");
@@ -53,10 +67,9 @@ export default function AdminDashboard() {
     fetchUsers();
   }, []);
 
-  // CREATE ADMIN BOOKING (FIXED ROUTE)
   const createAdminBooking = async () => {
     try {
-      await api.post("/bookings/admin/create", newBooking);
+      await api.post("/bookings", newBooking);
 
       setNewBooking({
         userId: "",
@@ -106,106 +119,98 @@ export default function AdminDashboard() {
       ? bookings
       : bookings.filter((b) => b.status === filter);
 
-  // ✅ FIXED + IMPROVED COUNTS (THIS IS WHAT YOU ASKED FOR)
   const counts = bookings.reduce(
     (acc, b) => {
       acc.total += 1;
       acc[b.status] = (acc[b.status] || 0) + 1;
       return acc;
     },
-    {
-      total: 0,
-      pending: 0,
-      confirmed: 0,
-      completed: 0,
-      cancelled: 0
-    }
+    { total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0 }
   );
 
   return (
-    <div style={{ maxWidth: "1000px", margin: "40px auto", padding: "0 20px" }}>
-      <h2>Admin Dashboard</h2>
+    <div className="container mt-5">
+      <h2 className="mb-4">Admin Dashboard</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* SUMMARY CARDS */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-        {[
-          { label: "Total", value: counts.total },
-          { label: "Pending", value: counts.pending },
-          { label: "Confirmed", value: counts.confirmed },
-          { label: "Completed", value: counts.completed },
-          { label: "Cancelled", value: counts.cancelled }
-        ].map((c) => (
-          <div key={c.label} style={{ padding: 10, border: "1px solid #ddd", borderRadius: 8 }}>
-            <strong>{c.label}</strong>
-            <p>{c.value}</p>
+      {/* SUMMARY */}
+      <div className="row mb-4">
+        {Object.entries(counts).map(([k, v]) => (
+          <div key={k} className="col-md-2">
+            <div className="card text-center">
+              <div className="card-body">
+                <h6>{k}</h6>
+                <h4>{v}</h4>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
       {/* CREATE BOOKING */}
-      <div style={{ padding: 20, border: "1px solid #ddd", marginBottom: 30 }}>
-        <h3>Create Booking for User</h3>
+      <div className="card p-3 mb-4">
+        <h5>Create Booking</h5>
 
-        <select name="userId" value={newBooking.userId} onChange={handleChange}>
+        <select className="form-select mb-2" name="userId" value={newBooking.userId} onChange={handleChange}>
           <option value="">Select User</option>
-          {users.map((u) => (
-            <option key={u._id} value={u._id}>
-              {u.name} ({u.email})
-            </option>
+          {users.map(u => (
+            <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
           ))}
         </select>
 
-        <select name="service" value={newBooking.service} onChange={handleChange}>
+        <select className="form-select mb-2" name="service" value={newBooking.service} onChange={handleChange}>
           <option value="">Select Service</option>
           {Object.entries(SERVICE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>
-              {v}
-            </option>
+            <option key={k} value={k}>{v}</option>
           ))}
         </select>
 
-        <input name="carMake" placeholder="Car Make" onChange={handleChange} />
-        <input name="carModel" placeholder="Car Model" onChange={handleChange} />
-        <input name="carYear" placeholder="Year" onChange={handleChange} />
-        <input type="date" name="date" onChange={handleChange} />
-        <textarea name="notes" placeholder="Notes" onChange={handleChange} />
+        <select className="form-select mb-2" name="carMake" value={newBooking.carMake}
+          onChange={(e) => setNewBooking({ ...newBooking, carMake: e.target.value, carModel: "" })}>
+          <option value="">Select Make</option>
+          {CAR_MAKES.map(m => <option key={m}>{m}</option>)}
+        </select>
 
-        <button onClick={createAdminBooking}>Create Booking</button>
-      </div>
+        <select className="form-select mb-2" name="carModel" value={newBooking.carModel} onChange={handleChange} disabled={!newBooking.carMake}>
+          <option value="">Select Model</option>
+          {newBooking.carMake && CAR_MODELS[newBooking.carMake].map(m => <option key={m}>{m}</option>)}
+        </select>
 
-      {/* FILTER */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-        {["all", ...STATUS_OPTIONS].map((f) => (
-          <button key={f} onClick={() => setFilter(f)}>
-            {f}
-          </button>
-        ))}
+        <select className="form-select mb-2" name="carYear" value={newBooking.carYear} onChange={handleChange}>
+          <option value="">Select Year</option>
+          {CAR_YEARS.map(y => <option key={y}>{y}</option>)}
+        </select>
+
+        <input type="date" className="form-control mb-2" name="date" onChange={handleChange} />
+        <textarea className="form-control mb-2" name="notes" onChange={handleChange} placeholder="Notes" />
+
+        <button className="btn btn-dark" onClick={createAdminBooking}>Create</button>
       </div>
 
       {/* BOOKINGS */}
-      {filtered.map((b) => (
-        <div key={b._id} style={{ border: "1px solid #ddd", marginBottom: 10, padding: 10 }}>
-          <strong>{SERVICE_LABELS[b.service]}</strong>
+      {filtered.map(b => (
+        <div key={b._id} className="card mb-3 shadow-sm">
+          <div className="card-body">
 
-          <p>
-            {b.carYear} {b.carMake} {b.carModel}
-          </p>
+            <h5>{SERVICE_LABELS[b.service]}</h5>
 
-          <p>
-            {b.user?.name} ({b.user?.email})
-          </p>
+            <p>{b.carYear} {b.carMake} {b.carModel}</p>
+            <p>{b.user?.name} ({b.user?.email})</p>
 
-          <select value={b.status} onChange={(e) => handleStatusChange(b._id, e.target.value)}>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            {/* ✅ TIMESTAMPS */}
+            <p className="text-muted small">Created: {new Date(b.createdAt).toLocaleString()}</p>
+            <p className="text-muted small">Updated: {new Date(b.updatedAt).toLocaleString()}</p>
 
-          <button onClick={() => handleDelete(b._id)}>Delete</button>
+            <select className="form-select mb-2"
+              value={b.status}
+              onChange={(e) => handleStatusChange(b._id, e.target.value)}>
+              {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
+            </select>
+
+            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b._id)}>Delete</button>
+
+          </div>
         </div>
       ))}
     </div>

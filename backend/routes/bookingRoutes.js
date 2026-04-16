@@ -26,4 +26,5 @@ router.delete("/admin/:id", isAuthenticated, isAdmin, adminDeleteBooking);
 // ✅ NEW — ADMIN CREATE BOOKING FOR ANY USER
 router.post("/admin/create", isAuthenticated, isAdmin, createBooking);
 
+
 module.exports = router;

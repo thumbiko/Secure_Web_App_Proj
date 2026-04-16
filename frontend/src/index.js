@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 // Suppress ResizeObserver browser noise — not a real error
 window.addEventListener('error', (e) => {

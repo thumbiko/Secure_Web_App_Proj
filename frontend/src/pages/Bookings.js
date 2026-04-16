@@ -1,7 +1,7 @@
+// src/pages/Bookings.js
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
-// ── dropdown options ──────────────────────────────────────────
 const SERVICE_OPTIONS = [
   { value: "starlight_installation", label: "Starlight Installation" },
   { value: "ambient_lighting", label: "Ambient Lighting" },
@@ -11,25 +11,25 @@ const SERVICE_OPTIONS = [
   { value: "general_modification", label: "General Modification" }
 ];
 
-const CAR_MAKES = [
-  "BMW", "Toyota", "Volkswagen", "Audi", "Ford", "Tesla"
-];
+const SERVICE_LABELS = Object.fromEntries(
+  SERVICE_OPTIONS.map(s => [s.value, s.label])
+);
 
-// ✅ NEW — models linked to make
+const CAR_MAKES = ["BMW", "Toyota", "Volkswagen", "Audi", "Ford", "Tesla"];
+
 const CAR_MODELS = {
-  BMW: ["1 Series", "2 Series", "3 Series", "5 Series", "X1", "X3", "X5"],
-  Toyota: ["Corolla", "Yaris", "RAV4", "C-HR"],
-  Volkswagen: ["Golf", "Polo", "Tiguan", "Passat"],
-  Audi: ["A3", "A4", "A6", "Q3", "Q5"],
-  Ford: ["Focus", "Puma", "Kuga"],
-  Tesla: ["Model 3", "Model Y", "Model S"]
+  BMW: ["1 Series", "3 Series", "5 Series", "X3", "X5"],
+  Toyota: ["Corolla", "Yaris", "RAV4"],
+  Volkswagen: ["Golf", "Polo", "Passat"],
+  Audi: ["A3", "A4", "Q5"],
+  Ford: ["Focus", "Puma"],
+  Tesla: ["Model 3", "Model Y"]
 };
 
 const CAR_YEARS = Array.from({ length: 30 }, (_, i) =>
   String(new Date().getFullYear() - i)
 );
 
-// ── component ────────────────────────────────────────────────
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
@@ -45,17 +45,14 @@ export default function Bookings() {
   });
 
   const fetchBookings = async () => {
-    try {
-      const res = await api.get("/bookings");
-      setBookings(res.data);
-    } catch {
-      setError("Could not load bookings");
-    }
+    const res = await api.get("/bookings");
+    setBookings(res.data);
   };
 
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
-  // ✅ UPDATED — reset model when make changes
   const handleChange = (e) => {
     if (e.target.name === "carMake") {
       setForm({ ...form, carMake: e.target.value, carModel: "" });
@@ -66,131 +63,76 @@ export default function Bookings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
     try {
       await api.post("/bookings", form);
-      setSuccess("Booking created successfully!");
-      setForm({ service: "", carMake: "", carModel: "", carYear: "", date: "", notes: "" });
-      fetchBookings();
-    } catch (err) {
-      setError(err.response?.data?.msg || "Booking failed");
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Cancel this booking?")) return;
-    try {
-      await api.delete(`/bookings/${id}`);
+      setSuccess("Booking created!");
       fetchBookings();
     } catch {
-      setError("Could not cancel booking");
+      setError("Booking failed");
     }
   };
 
-  const statusStyle = (status) => {
-    const colours = {
-      pending: { background: "#fff3cd", color: "#856404" },
-      confirmed: { background: "#d1ecf1", color: "#0c5460" },
-      completed: { background: "#d4edda", color: "#155724" },
-      cancelled: { background: "#f8d7da", color: "#721c24" }
+  const statusClass = (status) => {
+    const map = {
+      pending: "warning",
+      confirmed: "info",
+      completed: "success",
+      cancelled: "danger"
     };
-    return {
-      ...colours[status],
-      padding: "2px 10px",
-      borderRadius: "12px",
-      fontSize: "0.8rem",
-      fontWeight: "600"
-    };
+    return `badge bg-${map[status]}`;
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "40px auto", padding: "0 20px" }}>
+    <div className="container mt-5">
       <h2>My Bookings</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      <div className="card p-3 mb-4">
+        <h5>New Booking</h5>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "40px" }}>
-        <h3>New Booking</h3>
+        <form onSubmit={handleSubmit}>
+          <select className="form-select mb-2" name="service" onChange={handleChange}>
+            <option>Select Service</option>
+            {SERVICE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
 
-        {/* Service */}
-        <select name="service" value={form.service} onChange={handleChange} required>
-          <option value="">-- Select a service --</option>
-          {SERVICE_OPTIONS.map(s => (
-            <option key={s.value} value={s.value}>{s.label}</option>
-          ))}
-        </select>
+          <select className="form-select mb-2" name="carMake" onChange={handleChange}>
+            <option>Select Make</option>
+            {CAR_MAKES.map(m => <option key={m}>{m}</option>)}
+          </select>
 
-        {/* Car Make */}
-        <select name="carMake" value={form.carMake} onChange={handleChange} required>
-          <option value="">-- Select make --</option>
-          {CAR_MAKES.map(make => (
-            <option key={make} value={make}>{make}</option>
-          ))}
-        </select>
+          <select className="form-select mb-2" name="carModel" onChange={handleChange}>
+            <option>Select Model</option>
+            {form.carMake && CAR_MODELS[form.carMake].map(m => <option key={m}>{m}</option>)}
+          </select>
 
-        {/* ✅ NEW MODEL DROPDOWN */}
-        <select
-          name="carModel"
-          value={form.carModel}
-          onChange={handleChange}
-          required
-          disabled={!form.carMake}
-        >
-          <option value="">-- Select model --</option>
-          {form.carMake &&
-            CAR_MODELS[form.carMake].map(model => (
-              <option key={model} value={model}>{model}</option>
-            ))}
-        </select>
+          <select className="form-select mb-2" name="carYear" onChange={handleChange}>
+            <option>Select Year</option>
+            {CAR_YEARS.map(y => <option key={y}>{y}</option>)}
+          </select>
 
-        {/* Year */}
-        <select name="carYear" value={form.carYear} onChange={handleChange} required>
-          <option value="">-- Select year --</option>
-          {CAR_YEARS.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
+          <input type="date" className="form-control mb-2" name="date" onChange={handleChange} />
+          <textarea className="form-control mb-2" name="notes" onChange={handleChange} />
 
-        {/* Date */}
-        <input
-          type="date"
-          name="date"
-          value={form.date}
-          onChange={handleChange}
-          required
-          min={new Date().toISOString().split("T")[0]}
-        />
-
-        {/* Notes */}
-        <textarea
-          name="notes"
-          value={form.notes}
-          onChange={handleChange}
-          placeholder="Notes..."
-        />
-
-        <button type="submit">Book Now</button>
-      </form>
-
-      <h3>Your Bookings</h3>
-
-      {bookings.length === 0 && <p>No bookings yet.</p>}
+          <button className="btn btn-dark w-100">Book</button>
+        </form>
+      </div>
 
       {bookings.map(b => (
-        <div key={b._id}>
-          <strong>{b.service}</strong>
-          <span style={statusStyle(b.status)}>{b.status}</span>
-          <p>{b.carYear} {b.carMake} {b.carModel}</p>
-          <p>{new Date(b.date).toLocaleDateString()}</p>
+        <div key={b._id} className="card mb-3">
+          <div className="card-body">
+            <h5>{SERVICE_LABELS[b.service]}</h5>
+            <span className={statusClass(b.status)}>{b.status}</span>
 
-          {b.status === "pending" && (
-            <button onClick={() => handleDelete(b._id)}>
-              Cancel
-            </button>
-          )}
+            <p>{b.carYear} {b.carMake} {b.carModel}</p>
+
+            <p className="text-muted">
+              Created: {new Date(b.createdAt).toLocaleString()}
+            </p>
+
+            <p className="text-muted">
+              Updated: {new Date(b.updatedAt).toLocaleString()}
+            </p>
+          </div>
         </div>
       ))}
     </div>

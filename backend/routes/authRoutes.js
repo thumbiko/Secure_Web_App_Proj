@@ -26,4 +26,4 @@ router.get("/users", isAuthenticated, isAdmin, getAllUsers);
 // LOGOUT
 router.delete("/logout", logout);
 
-module.exports = router;
+module.exports = router;7
