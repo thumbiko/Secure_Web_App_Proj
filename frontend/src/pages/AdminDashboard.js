@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.js
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
@@ -13,38 +12,20 @@ const SERVICE_LABELS = {
 
 const STATUS_OPTIONS = ["pending", "confirmed", "completed", "cancelled"];
 
-const CAR_MAKES = ["BMW", "Toyota", "Volkswagen", "Audi", "Ford", "Tesla"];
-
-const CAR_MODELS = {
-  BMW: ["1 Series", "3 Series", "5 Series", "X3", "X5"],
-  Toyota: ["Corolla", "Yaris", "RAV4"],
-  Volkswagen: ["Golf", "Polo", "Passat"],
-  Audi: ["A3", "A4", "Q5"],
-  Ford: ["Focus", "Puma"],
-  Tesla: ["Model 3", "Model Y"]
+const VIEWS = {
+  DASHBOARD: "dashboard",
+  BOOKINGS: "bookings",
+  USERS: "users"
 };
 
-const CAR_YEARS = Array.from({ length: 30 }, (_, i) =>
-  String(new Date().getFullYear() - i)
-);
-
 export default function AdminDashboard() {
+  const [view, setView] = useState(VIEWS.DASHBOARD);
+
   const [bookings, setBookings] = useState([]);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("all");
 
-  const [newBooking, setNewBooking] = useState({
-    userId: "",
-    service: "",
-    carMake: "",
-    carModel: "",
-    carYear: "",
-    date: "",
-    notes: ""
-  });
-
-  // FETCH BOOKINGS
+  // ───────── FETCH DATA ─────────
   const fetchBookings = async () => {
     try {
       const res = await api.get("/bookings/admin/all");
@@ -54,7 +35,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // FETCH USERS
   const fetchUsers = async () => {
     try {
       const res = await api.get("/auth/users");
@@ -69,7 +49,7 @@ export default function AdminDashboard() {
     fetchUsers();
   }, []);
 
-  // DELETE USER
+  // ───────── USER ACTIONS ─────────
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
 
@@ -77,38 +57,11 @@ export default function AdminDashboard() {
       await api.delete(`/auth/users/${id}`);
       fetchUsers();
     } catch {
-      setError("User delete failed");
+      setError("Failed to delete user");
     }
   };
 
-  // CREATE BOOKING
-  const createAdminBooking = async () => {
-    try {
-      await api.post("/bookings", newBooking);
-
-      setNewBooking({
-        userId: "",
-        service: "",
-        carMake: "",
-        carModel: "",
-        carYear: "",
-        date: "",
-        notes: ""
-      });
-
-      fetchBookings();
-    } catch {
-      setError("Failed to create booking");
-    }
-  };
-
-  const handleChange = (e) => {
-    setNewBooking({
-      ...newBooking,
-      [e.target.name]: e.target.value
-    });
-  };
-
+  // ───────── BOOKING ACTIONS ─────────
   const handleStatusChange = async (id, status) => {
     try {
       await api.patch(`/bookings/admin/${id}`, { status });
@@ -118,23 +71,18 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this booking?")) return;
+  const handleDeleteBooking = async (id) => {
+    if (!window.confirm("Delete booking?")) return;
 
     try {
       await api.delete(`/bookings/admin/${id}`);
       fetchBookings();
     } catch {
-      setError("Delete failed");
+      setError("Failed to delete booking");
     }
   };
 
-  const filtered =
-    filter === "all"
-      ? bookings
-      : bookings.filter((b) => b.status === filter);
-
-  // COUNTS
+  // ───────── COUNTS ─────────
   const counts = bookings.reduce(
     (acc, b) => {
       acc.total += 1;
@@ -144,134 +92,155 @@ export default function AdminDashboard() {
     { total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0 }
   );
 
-  return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Admin Dashboard</h2>
+  // ───────── SIDEBAR ─────────
+  const Sidebar = () => (
+    <div style={{
+      width: "220px",
+      height: "100vh",
+      position: "fixed",
+      left: 0,
+      top: 0,
+      background: "#111",
+      color: "#fff",
+      padding: "20px"
+    }}>
+      <h4 className="mb-4">Admin</h4>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      <button className="btn btn-dark w-100 mb-2"
+        onClick={() => setView(VIEWS.DASHBOARD)}>
+        Dashboard Home
+      </button>
 
-      {/* OVERVIEW */}
-      <div className="row mb-4">
+      <button className="btn btn-dark w-100 mb-2"
+        onClick={() => setView(VIEWS.BOOKINGS)}>
+        Booking Management
+      </button>
+
+      <button className="btn btn-dark w-100 mb-2"
+        onClick={() => setView(VIEWS.USERS)}>
+        Users Directory
+      </button>
+    </div>
+  );
+
+  // ───────── DASHBOARD HOME ─────────
+  const DashboardHome = () => (
+    <div>
+      <h2>Dashboard Overview</h2>
+
+      <div className="row mt-4">
+        <div className="col-md-4">
+          <div className="card p-3">
+            <h6>Total Users</h6>
+            <h3>{users.length}</h3>
+          </div>
+        </div>
 
         <div className="col-md-4">
-          <div className="card text-center shadow-sm">
-            <div className="card-body">
-              <h6>Total Users</h6>
-              <h3>{users.length}</h3>
-            </div>
+          <div className="card p-3">
+            <h6>Total Bookings</h6>
+            <h3>{counts.total}</h3>
           </div>
         </div>
 
         <div className="col-md-4">
-          <div className="card text-center shadow-sm">
-            <div className="card-body">
-              <h6>Total Bookings</h6>
-              <h3>{counts.total}</h3>
-            </div>
+          <div className="card p-3">
+            <h6>Pending Bookings</h6>
+            <h3>{counts.pending}</h3>
           </div>
         </div>
-
       </div>
 
-      {/* USERS MANAGEMENT */}
-      <div className="card mb-4">
-        <div className="card-body">
-          <h5>Users</h5>
+      {/* SIMPLE CALENDAR VIEW */}
+      <div className="card mt-4 p-3">
+        <h5>Booking Calendar (Upcoming)</h5>
 
-          {users.map((u) => (
-            <div key={u._id} className="d-flex justify-content-between align-items-center border-bottom py-2">
-              <div>
-                {u.name} ({u.email})
-              </div>
-
-              <button
-                className="btn btn-sm btn-danger"
-                onClick={() => handleDeleteUser(u._id)}
-              >
-                Delete
-              </button>
+        {bookings
+          .filter(b => b.status !== "cancelled")
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 10)
+          .map(b => (
+            <div key={b._id} className="border-bottom py-2">
+              <strong>{new Date(b.date).toLocaleDateString()}</strong> —{" "}
+              {SERVICE_LABELS[b.service]} ({b.carMake} {b.carModel})
             </div>
           ))}
-        </div>
       </div>
+    </div>
+  );
 
-      {/* CREATE BOOKING */}
-      <div className="card p-3 mb-4">
-        <h5>Create Booking</h5>
+  // ───────── BOOKINGS ─────────
+  const BookingManagement = () => (
+    <div>
+      <h2>Booking Management</h2>
 
-        <select className="form-select mb-2" name="userId" value={newBooking.userId} onChange={handleChange}>
-          <option value="">Select User</option>
-          {users.map(u => (
-            <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
-          ))}
-        </select>
+      {bookings.map(b => (
+        <div key={b._id} className="card mb-3 p-3">
+          <h5>{SERVICE_LABELS[b.service]}</h5>
 
-        <select className="form-select mb-2" name="service" value={newBooking.service} onChange={handleChange}>
-          <option value="">Select Service</option>
-          {Object.entries(SERVICE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
-        </select>
+          <p>
+            {b.carYear} {b.carMake} {b.carModel}
+          </p>
 
-        <select className="form-select mb-2" name="carMake"
-          value={newBooking.carMake}
-          onChange={(e) => setNewBooking({ ...newBooking, carMake: e.target.value, carModel: "" })}>
-          <option value="">Select Make</option>
-          {CAR_MAKES.map(m => <option key={m}>{m}</option>)}
-        </select>
+          <p className="text-muted">
+            {b.user?.name} ({b.user?.email})
+          </p>
 
-        <select className="form-select mb-2" name="carModel"
-          value={newBooking.carModel}
-          onChange={handleChange}
-          disabled={!newBooking.carMake}>
-          <option value="">Select Model</option>
-          {newBooking.carMake &&
-            CAR_MODELS[newBooking.carMake].map(m => <option key={m}>{m}</option>)}
-        </select>
+          <select
+            className="form-select mb-2"
+            value={b.status}
+            onChange={(e) => handleStatusChange(b._id, e.target.value)}
+          >
+            {STATUS_OPTIONS.map(s => (
+              <option key={s}>{s}</option>
+            ))}
+          </select>
 
-        <select className="form-select mb-2" name="carYear" value={newBooking.carYear} onChange={handleChange}>
-          <option value="">Select Year</option>
-          {CAR_YEARS.map(y => <option key={y}>{y}</option>)}
-        </select>
-
-        <input type="date" className="form-control mb-2" name="date" onChange={handleChange} />
-        <textarea className="form-control mb-2" name="notes" onChange={handleChange} placeholder="Notes" />
-
-        <button className="btn btn-dark" onClick={createAdminBooking}>Create</button>
-      </div>
-
-      {/* BOOKINGS */}
-      {filtered.map(b => (
-        <div key={b._id} className="card mb-3 shadow-sm">
-          <div className="card-body">
-
-            <h5>{SERVICE_LABELS[b.service]}</h5>
-
-            <p>{b.carYear} {b.carMake} {b.carModel}</p>
-            <p>{b.user?.name} ({b.user?.email})</p>
-
-            <p className="text-muted small">
-              Created: {new Date(b.createdAt).toLocaleString()}
-            </p>
-
-            <p className="text-muted small">
-              Updated: {new Date(b.updatedAt).toLocaleString()}
-            </p>
-
-            <select className="form-select mb-2"
-              value={b.status}
-              onChange={(e) => handleStatusChange(b._id, e.target.value)}>
-              {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
-            </select>
-
-            <button className="btn btn-danger btn-sm"
-              onClick={() => handleDelete(b._id)}>
-              Delete
-            </button>
-
-          </div>
+          <button
+            className="btn btn-danger btn-sm"
+            onClick={() => handleDeleteBooking(b._id)}
+          >
+            Cancel
+          </button>
         </div>
       ))}
+    </div>
+  );
+
+  // ───────── USERS ─────────
+  const UsersDirectory = () => (
+    <div>
+      <h2>Users Directory</h2>
+
+      {users.map(u => (
+        <div key={u._id} className="card mb-2 p-2 d-flex flex-row justify-content-between">
+          <div>
+            <strong>{u.name}</strong> <br />
+            <small>{u.email}</small>
+          </div>
+
+          <button
+            className="btn btn-sm btn-danger"
+            onClick={() => handleDeleteUser(u._id)}
+          >
+            Delete
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div>
+      <Sidebar />
+
+      <div style={{ marginLeft: "240px", padding: "20px" }}>
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {view === VIEWS.DASHBOARD && <DashboardHome />}
+        {view === VIEWS.BOOKINGS && <BookingManagement />}
+        {view === VIEWS.USERS && <UsersDirectory />}
+      </div>
     </div>
   );
 }
