@@ -113,3 +113,31 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ msg: "Failed to fetch users" });
   }
 };
+
+
+// =====================
+// ADMIN — DELETE USER
+// =====================
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // prevent deleting self
+    if (user._id.toString() === req.session.user.id) {
+      return res.status(400).json({ msg: "You cannot delete yourself" });
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    res.json({ msg: "User deleted successfully" });
+
+  } catch (err) {
+    res.status(500).json({ msg: "Failed to delete user" });
+  }
+};

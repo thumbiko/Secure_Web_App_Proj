@@ -44,6 +44,7 @@ export default function AdminDashboard() {
     notes: ""
   });
 
+  // FETCH BOOKINGS
   const fetchBookings = async () => {
     try {
       const res = await api.get("/bookings/admin/all");
@@ -53,6 +54,7 @@ export default function AdminDashboard() {
     }
   };
 
+  // FETCH USERS
   const fetchUsers = async () => {
     try {
       const res = await api.get("/auth/users");
@@ -67,6 +69,19 @@ export default function AdminDashboard() {
     fetchUsers();
   }, []);
 
+  // DELETE USER
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Delete this user?")) return;
+
+    try {
+      await api.delete(`/auth/users/${id}`);
+      fetchUsers();
+    } catch {
+      setError("User delete failed");
+    }
+  };
+
+  // CREATE BOOKING
   const createAdminBooking = async () => {
     try {
       await api.post("/bookings", newBooking);
@@ -119,6 +134,7 @@ export default function AdminDashboard() {
       ? bookings
       : bookings.filter((b) => b.status === filter);
 
+  // COUNTS
   const counts = bookings.reduce(
     (acc, b) => {
       acc.total += 1;
@@ -134,18 +150,49 @@ export default function AdminDashboard() {
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* SUMMARY */}
+      {/* OVERVIEW */}
       <div className="row mb-4">
-        {Object.entries(counts).map(([k, v]) => (
-          <div key={k} className="col-md-2">
-            <div className="card text-center">
-              <div className="card-body">
-                <h6>{k}</h6>
-                <h4>{v}</h4>
-              </div>
+
+        <div className="col-md-4">
+          <div className="card text-center shadow-sm">
+            <div className="card-body">
+              <h6>Total Users</h6>
+              <h3>{users.length}</h3>
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="col-md-4">
+          <div className="card text-center shadow-sm">
+            <div className="card-body">
+              <h6>Total Bookings</h6>
+              <h3>{counts.total}</h3>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* USERS MANAGEMENT */}
+      <div className="card mb-4">
+        <div className="card-body">
+          <h5>Users</h5>
+
+          {users.map((u) => (
+            <div key={u._id} className="d-flex justify-content-between align-items-center border-bottom py-2">
+              <div>
+                {u.name} ({u.email})
+              </div>
+
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={() => handleDeleteUser(u._id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* CREATE BOOKING */}
@@ -166,15 +213,20 @@ export default function AdminDashboard() {
           ))}
         </select>
 
-        <select className="form-select mb-2" name="carMake" value={newBooking.carMake}
+        <select className="form-select mb-2" name="carMake"
+          value={newBooking.carMake}
           onChange={(e) => setNewBooking({ ...newBooking, carMake: e.target.value, carModel: "" })}>
           <option value="">Select Make</option>
           {CAR_MAKES.map(m => <option key={m}>{m}</option>)}
         </select>
 
-        <select className="form-select mb-2" name="carModel" value={newBooking.carModel} onChange={handleChange} disabled={!newBooking.carMake}>
+        <select className="form-select mb-2" name="carModel"
+          value={newBooking.carModel}
+          onChange={handleChange}
+          disabled={!newBooking.carMake}>
           <option value="">Select Model</option>
-          {newBooking.carMake && CAR_MODELS[newBooking.carMake].map(m => <option key={m}>{m}</option>)}
+          {newBooking.carMake &&
+            CAR_MODELS[newBooking.carMake].map(m => <option key={m}>{m}</option>)}
         </select>
 
         <select className="form-select mb-2" name="carYear" value={newBooking.carYear} onChange={handleChange}>
@@ -198,9 +250,13 @@ export default function AdminDashboard() {
             <p>{b.carYear} {b.carMake} {b.carModel}</p>
             <p>{b.user?.name} ({b.user?.email})</p>
 
-            {/* ✅ TIMESTAMPS */}
-            <p className="text-muted small">Created: {new Date(b.createdAt).toLocaleString()}</p>
-            <p className="text-muted small">Updated: {new Date(b.updatedAt).toLocaleString()}</p>
+            <p className="text-muted small">
+              Created: {new Date(b.createdAt).toLocaleString()}
+            </p>
+
+            <p className="text-muted small">
+              Updated: {new Date(b.updatedAt).toLocaleString()}
+            </p>
 
             <select className="form-select mb-2"
               value={b.status}
@@ -208,7 +264,10 @@ export default function AdminDashboard() {
               {STATUS_OPTIONS.map(s => <option key={s}>{s}</option>)}
             </select>
 
-            <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b._id)}>Delete</button>
+            <button className="btn btn-danger btn-sm"
+              onClick={() => handleDelete(b._id)}>
+              Delete
+            </button>
 
           </div>
         </div>

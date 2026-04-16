@@ -6,7 +6,8 @@ const {
   login,
   getMe,
   logout,
-  getAllUsers
+  getAllUsers,
+  deleteUser
 } = require("../controllers/authController");
 
 const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
@@ -22,6 +23,8 @@ router.get("/auth", getMe);
 
 // ADMIN — GET ALL USERS
 router.get("/users", isAuthenticated, isAdmin, getAllUsers);
+
+router.delete("/users/:id", isAuthenticated, isAdmin, deleteUser);
 
 // LOGOUT
 router.delete("/logout", logout);

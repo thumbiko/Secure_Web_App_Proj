@@ -23,7 +23,7 @@ router.get("/admin/all",    isAuthenticated, isAdmin, getAllBookings);
 router.patch("/admin/:id",  isAuthenticated, isAdmin, updateBookingStatus);
 router.delete("/admin/:id", isAuthenticated, isAdmin, adminDeleteBooking);
 
-// ✅ NEW — ADMIN CREATE BOOKING FOR ANY USER
+// ADMIN CREATE BOOKING FOR ANY USER
 router.post("/admin/create", isAuthenticated, isAdmin, createBooking);
 
 

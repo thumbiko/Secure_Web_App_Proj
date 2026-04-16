@@ -84,15 +84,21 @@ export default function Bookings() {
 
   return (
     <div className="container mt-5">
-      <h2>My Bookings</h2>
 
+      <h2> Bookings</h2>
+
+      {/* =======================
+          NEW BOOKING FORM
+      ======================= */}
       <div className="card p-3 mb-4">
         <h5>New Booking</h5>
 
         <form onSubmit={handleSubmit}>
           <select className="form-select mb-2" name="service" onChange={handleChange}>
             <option>Select Service</option>
-            {SERVICE_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            {SERVICE_OPTIONS.map(s => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
           </select>
 
           <select className="form-select mb-2" name="carMake" onChange={handleChange}>
@@ -102,7 +108,9 @@ export default function Bookings() {
 
           <select className="form-select mb-2" name="carModel" onChange={handleChange}>
             <option>Select Model</option>
-            {form.carMake && CAR_MODELS[form.carMake].map(m => <option key={m}>{m}</option>)}
+            {form.carMake && CAR_MODELS[form.carMake].map(m => (
+              <option key={m}>{m}</option>
+            ))}
           </select>
 
           <select className="form-select mb-2" name="carYear" onChange={handleChange}>
@@ -117,9 +125,18 @@ export default function Bookings() {
         </form>
       </div>
 
+      {/* =======================
+          👇 THIS IS YOUR NEW ADDITION
+      ======================= */}
+      <h4 className="mb-3">My Bookings</h4>
+
+      {/* =======================
+          BOOKINGS LIST
+      ======================= */}
       {bookings.map(b => (
         <div key={b._id} className="card mb-3">
           <div className="card-body">
+
             <h5>{SERVICE_LABELS[b.service]}</h5>
             <span className={statusClass(b.status)}>{b.status}</span>
 
@@ -132,9 +149,11 @@ export default function Bookings() {
             <p className="text-muted">
               Updated: {new Date(b.updatedAt).toLocaleString()}
             </p>
+
           </div>
         </div>
       ))}
+
     </div>
   );
 }

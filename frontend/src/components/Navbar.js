@@ -33,7 +33,7 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  // 🔥 helper for active links
+  // helper for active links
   const isActive = (path) => location.pathname === path;
 
   return (
