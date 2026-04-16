@@ -1,6 +1,7 @@
 // src/pages/Bookings.js
 import { useEffect, useState } from "react";
 import api from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 const SERVICE_OPTIONS = [
   { value: "starlight_installation", label: "Starlight Installation" },
@@ -31,11 +32,15 @@ const CAR_YEARS = Array.from({ length: 30 }, (_, i) =>
 );
 
 export default function Bookings() {
+  const { user } = useAuth();
+
   const [bookings, setBookings] = useState([]);
+  const [users, setUsers] = useState([]); //
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const [form, setForm] = useState({
+    userId: "", //
     service: "",
     carMake: "",
     carModel: "",
@@ -49,8 +54,16 @@ export default function Bookings() {
     setBookings(res.data);
   };
 
+  const fetchUsers = async () => {
+    if (user?.role === "admin") {
+      const res = await api.get("/auth/users");
+      setUsers(res.data);
+    }
+  };
+
   useEffect(() => {
     fetchBookings();
+    fetchUsers();
   }, []);
 
   const handleChange = (e) => {
@@ -63,6 +76,7 @@ export default function Bookings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await api.post("/bookings", form);
       setSuccess("Booking created!");
@@ -85,15 +99,37 @@ export default function Bookings() {
   return (
     <div className="container mt-5">
 
-      <h2> Bookings</h2>
+      {/* HEADER */}
+      <div className="mb-4">
+        <h2>Bookings</h2>
+        <p className="text-muted">Manage your service bookings</p>
+      </div>
 
-      {/* =======================
-          NEW BOOKING FORM
-      ======================= */}
-      <div className="card p-3 mb-4">
+      {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
+
+      {/* CREATE BOOKING */}
+      <div className="card p-3 mb-4 shadow-sm">
         <h5>New Booking</h5>
 
         <form onSubmit={handleSubmit}>
+
+          {/*  ADMIN ONLY USER SELECT */}
+          {user?.role === "admin" && (
+            <select
+              className="form-select mb-2"
+              name="userId"
+              onChange={handleChange}
+            >
+              <option value="">Assign User</option>
+              {users.map(u => (
+                <option key={u._id} value={u._id}>
+                  {u.name} ({u.email})
+                </option>
+              ))}
+            </select>
+          )}
+
           <select className="form-select mb-2" name="service" onChange={handleChange}>
             <option>Select Service</option>
             {SERVICE_OPTIONS.map(s => (
@@ -125,34 +161,37 @@ export default function Bookings() {
         </form>
       </div>
 
-      {/* =======================
-          👇 THIS IS YOUR NEW ADDITION
-      ======================= */}
-      <h4 className="mb-3">My Bookings</h4>
+      {/* BOOKINGS TABLE */}
+      <div className="card p-3 shadow-sm">
+        <h5 className="mb-3">My Bookings</h5>
 
-      {/* =======================
-          BOOKINGS LIST
-      ======================= */}
-      {bookings.map(b => (
-        <div key={b._id} className="card mb-3">
-          <div className="card-body">
-
-            <h5>{SERVICE_LABELS[b.service]}</h5>
-            <span className={statusClass(b.status)}>{b.status}</span>
-
-            <p>{b.carYear} {b.carMake} {b.carModel}</p>
-
-            <p className="text-muted">
-              Created: {new Date(b.createdAt).toLocaleString()}
-            </p>
-
-            <p className="text-muted">
-              Updated: {new Date(b.updatedAt).toLocaleString()}
-            </p>
-
-          </div>
-        </div>
-      ))}
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Car</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map(b => (
+              <tr key={b._id}>
+                <td>{SERVICE_LABELS[b.service]}</td>
+                <td>{b.carYear} {b.carMake} {b.carModel}</td>
+                <td>
+                  <span className={statusClass(b.status)}>
+                    {b.status}
+                  </span>
+                </td>
+                <td>{new Date(b.createdAt).toLocaleString()}</td>
+                <td>{new Date(b.updatedAt).toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
     </div>
   );
