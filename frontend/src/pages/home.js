@@ -1,6 +1,13 @@
 // src/pages/Home.js
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import starlight from "../assets/images/services/starlight.jpg";
+import ambient from "../assets/images/services/ambient.jpg";
+import carplay from "../assets/images/services/carplay.jpg";
+import valet from "../assets/images/services/valet.jpg";
+import diagnostics from "../assets/images/services/diagnostics.jpg";
+import mods from "../assets/images/services/mods.jpg";
+
 
 const SERVICES = [
   { name: "Starlight Installation", desc: "Fibre optic roof lighting" },
