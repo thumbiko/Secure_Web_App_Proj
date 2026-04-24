@@ -12,6 +12,7 @@ const {
 } = require("../controllers/bookingController");
 
 const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
+const { validateBooking, validateStatusUpdate } = require("../middleware/validators");
 
 // USER ROUTES
 router.post("/",      isAuthenticated, createBooking);
