@@ -64,68 +64,66 @@ added after the fact.
 ---
 
 ## Project Structure
+## Project Structure
+
+```
 x-hausted-autos/
-│
 ├── backend/
 │   ├── config/
-│   │   └── db.js                  # MongoDB connection
-│   │
+│   │   └── db.js
 │   ├── controllers/
-│   │   ├── authController.js      # Register, login, logout, user management
-│   │   ├── bookingController.js   # Booking CRUD logic
-│   │   └── serviceController.js   # Service CRUD logic
-│   │
+│   │   ├── authController.js
+│   │   ├── bookingController.js
+│   │   └── serviceController.js
 │   ├── middleware/
-│   │   ├── authMiddleware.js      # isAuthenticated, isAdmin checks
-│   │   └── validators.js          # express-validator chains for all routes
-│   │
+│   │   ├── authMiddleware.js
+│   │   └── validators.js
 │   ├── models/
-│   │   ├── Booking.js             # Booking schema with enum and length constraints
-│   │   ├── Service.js             # Service schema
-│   │   └── User.js                # User schema with role enum
-│   │
+│   │   ├── Booking.js
+│   │   ├── Service.js
+│   │   └── User.js
 │   ├── routes/
-│   │   ├── authRoutes.js          # Auth and user management endpoints
-│   │   ├── bookingRoutes.js       # Booking endpoints (user + admin)
-│   │   └── serviceRoutes.js       # Service endpoints
-│   │
+│   │   ├── authRoutes.js
+│   │   ├── bookingRoutes.js
+│   │   └── serviceRoutes.js
 │   ├── scripts/
-│   │   └── makeAdmin.js           # Utility to promote a user to admin role
-│   │
-│   ├── .env                       # Environment variables (not committed)
+│   │   └── makeAdmin.js
+│   ├── .env
 │   ├── package.json
-│   └── server.js                  # App entry point, middleware config
+│   └── server.js
 │
 ├── frontend/
 │   ├── public/
-│   │
 │   └── src/
 │       ├── api/
-│       │   └── api.js             # Axios instance with credentials
-│       │
-│       ├── assets/images/services/
-│       │   └── *.jpg              # Service images
-│       │
-│       ├── components/            # Reusable UI components
-│       │
+│       │   └── api.js
+│       ├── assets/
+│       │   └── images/
+│       │       └── services/
+│       │           ├── ambient.jpg
+│       │           ├── carplay.jpg
+│       │           ├── diagnostics.jpg
+│       │           ├── mods.jpg
+│       │           ├── starlight.jpg
+│       │           └── valet.jpg
+│       ├── components/
 │       ├── context/
-│       │   └── AuthContext.js     # Global auth state management
-│       │
+│       │   └── AuthContext.js
 │       ├── data/
-│       │   └── cars.js            # Static car data
-│       │
+│       │   └── cars.js
 │       ├── pages/
-│       │   ├── AdminDashboard.js  # Admin management interface
-│       │   ├── Bookings.js        # User bookings view
-│       │   ├── home.js            # Landing page
-│       │   ├── login.js           # Login page
-│       │   └── register.js        # Registration page
-│       │
+│       │   ├── AdminDashboard.js
+│       │   ├── Bookings.js
+│       │   ├── home.js
+│       │   ├── login.js
+│       │   └── register.js
+│       ├── App.css
 │       ├── App.js
 │       └── index.js
 │
 ├── .gitignore
 └── README.md
+```
 
 
 
