@@ -148,9 +148,9 @@ node scripts/makeAdmin.js your@email.com
 ## Testing
 
 ### Tools Used
-- **Postman** — manual API testing for all endpoints
-- **Semgrep** — static application security testing (SAST)
-- **npm audit** — dependency vulnerability scanning
+- **Thunder Client Extension tool in VS code** — manual API testing for all endpoints
+- **Npm Audit** — static application security testing (SAST) and dependency vulnerability scanning
+
 
 ### Security Tests Performed
 
