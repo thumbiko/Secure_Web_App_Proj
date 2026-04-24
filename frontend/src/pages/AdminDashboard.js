@@ -19,9 +19,9 @@ export default function AdminDashboard() {
   const [view, setView] = useState("dashboard"); // sidebar control
   const [error, setError] = useState("");
 
-  // =========================
+  
   // FETCH DATA
-  // =========================
+  
   const fetchBookings = async () => {
     try {
       const res = await api.get("/bookings/admin/all");
@@ -45,9 +45,9 @@ export default function AdminDashboard() {
     fetchUsers();
   }, []);
 
-  // =========================
+  
   // DELETE USER
-  // =========================
+  
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Delete this user?")) return;
 
@@ -59,9 +59,9 @@ export default function AdminDashboard() {
     }
   };
 
-  // =========================
+  
   // BOOKING ACTIONS
-  // =========================
+  
   const handleStatusChange = async (id, status) => {
     try {
       await api.patch(`/bookings/admin/${id}`, { status });
@@ -82,9 +82,9 @@ export default function AdminDashboard() {
     }
   };
 
-  // =========================
+  
   // COUNTS
-  // =========================
+  
   const counts = bookings.reduce(
     (acc, b) => {
       acc.total++;
@@ -94,9 +94,9 @@ export default function AdminDashboard() {
     { total: 0, pending: 0, confirmed: 0, completed: 0, cancelled: 0 }
   );
 
-  // =========================
+  
   // BAR CHART DATA
-  // =========================
+  
   const chartData = {
     labels: ["Pending", "Confirmed", "Completed", "Cancelled"],
     datasets: [
@@ -112,9 +112,9 @@ export default function AdminDashboard() {
     ]
   };
 
-  // =========================
+  
   // UI
-  // =========================
+  
   return (
     <div className="d-flex">
 

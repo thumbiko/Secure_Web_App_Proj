@@ -1,5 +1,5 @@
 // controllers/bookingController.js
-const Booking = require("../models/Booking");
+/*const Booking = require("../models/Booking");
 
 // CREATE BOOKING (user OR admin assigns user)
 exports.createBooking = async (req, res) => {
@@ -113,5 +113,102 @@ exports.adminDeleteBooking = async (req, res) => {
     res.json({ msg: "Deleted" });
   } catch {
     res.status(500).json({ msg: "Delete failed" });
+  }
+};
+
+/*/
+
+
+
+const Booking = require("../models/Booking");
+
+exports.createBooking = async (req, res) => {
+  try {
+    const { service, carMake, carModel, carYear, notes, date, userId } = req.body;
+
+    const assignedUser =
+      req.session.user.role === "admin" && userId
+        ? userId
+        : req.session.user.id;
+
+    const booking = await Booking.create({
+      user: assignedUser,
+      service,
+      carMake,
+      carModel,
+      carYear,
+      notes,
+      date
+    });
+
+    res.status(201).json(booking);
+  } catch (err) {
+    res.status(500).json({ msg: "Booking could not be created" });
+  }
+};
+
+exports.getMyBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ user: req.session.user.id })
+      .sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ msg: "Could not retrieve your bookings" });
+  }
+};
+
+exports.deleteBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) return res.status(404).json({ msg: "Booking not found" });
+
+    if (booking.user.toString() !== req.session.user.id) {
+      return res.status(403).json({ msg: "You do not have permission to delete this booking" });
+    }
+
+    await booking.deleteOne();
+    res.json({ msg: "Booking removed successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Delete operation failed" });
+  }
+};
+
+exports.getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate("user", "name email")
+      .sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ msg: "Could not retrieve bookings" });
+  }
+};
+
+exports.updateBookingStatus = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) return res.status(404).json({ msg: "Booking not found" });
+
+    booking.status = req.body.status;
+    await booking.save();
+
+    res.json(booking);
+  } catch (err) {
+    res.status(500).json({ msg: "Status update failed" });
+  }
+};
+
+exports.adminDeleteBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) return res.status(404).json({ msg: "Booking not found" });
+
+    await booking.deleteOne();
+    res.json({ msg: "Booking removed by admin" });
+  } catch (err) {
+    res.status(500).json({ msg: "Admin delete failed" });
   }
 };

@@ -2,9 +2,9 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
-// =====================
+
 // REGISTER
-// =====================
+
 exports.register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -32,9 +32,9 @@ exports.register = async (req, res) => {
   }
 };
 
-// =====================
+
 // LOGIN
-// =====================
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,9 +63,9 @@ exports.login = async (req, res) => {
   }
 };
 
-// =====================
+
 // GET ME
-// =====================
+
 exports.getMe = async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ msg: "Not authenticated" });
@@ -85,9 +85,9 @@ exports.getMe = async (req, res) => {
   }
 };
 
-// =====================
+
 // LOGOUT
-// =====================
+
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -99,9 +99,9 @@ exports.logout = (req, res) => {
   });
 };
 
-// =====================
-// ADMIN — GET ALL USERS (NEW)
-// =====================
+
+// ADMIN — GET  USERS 
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find()
@@ -116,9 +116,9 @@ exports.getAllUsers = async (req, res) => {
 };
 
 
-// =====================
-// ADMIN — DELETE USER
-// =====================
+
+// ADMIN — DELETE USERS
+
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
