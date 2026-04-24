@@ -1,3 +1,4 @@
+// routes/authRoutes.js
 const express = require("express");
 const router = express.Router();
 
@@ -29,4 +30,4 @@ router.delete("/users/:id", isAuthenticated, isAdmin, deleteUser);
 // LOGOUT
 router.delete("/logout", logout);
 
-module.exports = router;7
+module.exports = router;
