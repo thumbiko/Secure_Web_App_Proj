@@ -3,7 +3,6 @@
 A full-stack web application for managing automotive service bookings, built with security integrated at every layer of development. Developed as part of the Secure Web Development module at National College of Ireland.
 
 ---
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -29,7 +28,6 @@ meaning security was treated as a core requirement from the design phase rather 
 added after the fact.
 
 ---
-
 ## Features
 
 ### User
@@ -62,10 +60,6 @@ added after the fact.
 | Request Size Limit | express.json limit 10kb | Prevents payload-based attacks |
 
 ---
-
-## Project Structure
-
-
 ## Project Structure
 
 ```
