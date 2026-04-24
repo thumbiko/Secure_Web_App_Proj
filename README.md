@@ -64,3 +64,129 @@ added after the fact.
 ---
 
 ## Project Structure
+
+
+
+---
+
+## Setup and Installation
+
+### Prerequisites
+
+- Node.js v18 or higher
+- MongoDB (local instance or MongoDB Atlas)
+- npm
+
+### Steps
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/thumbiko/Secure_Web_App_Proj.git
+cd Secure_Web_App_Proj
+```
+
+2. Install backend dependencies
+
+```bash
+cd backend
+npm install
+```
+
+3. Create your environment file in the backend directory
+
+4. Install frontend dependencies
+
+```bash
+cd ../frontend
+npm install
+```
+
+5. Start the backend server
+
+```bash
+cd ../backend
+npm start
+```
+
+6. Start the frontend
+
+```bash
+cd ../frontend
+npm start
+```
+
+The application will be available at `http://localhost:3000`  
+The API runs at `http://localhost:5000/api`
+
+### Creating an Admin Account
+
+Register a normal user account through the application, then run:
+
+```bash
+cd backend
+node scripts/makeAdmin.js your@email.com
+```
+
+---
+
+## Usage
+
+### As a User
+- Navigate to `/register` to create an account
+- Log in at `/login`
+- Browse services on the home page
+- Create and manage your bookings from the Bookings page
+
+### As an Admin
+- Log in with an admin account
+- Access the Admin Dashboard to manage all bookings, services, and users
+- Update booking statuses, create bookings for users, or remove accounts
+
+---
+
+## Testing
+
+### Tools Used
+- **Postman** — manual API testing for all endpoints
+- **Semgrep** — static application security testing (SAST)
+- **npm audit** — dependency vulnerability scanning
+
+### Security Tests Performed
+
+**Input Validation**  
+Submitted registration requests with weak passwords, invalid emails, and special characters in name fields.  
+All rejected with HTTP 400 before reaching the database.
+
+**NoSQL Injection**  
+Sent `{ "$gt": "" }` as email and password values to the login endpoint.  
+express-mongo-sanitize stripped the operators — request returned HTTP 400 as a normal failed login.
+
+**Brute Force / Rate Limiting**  
+Sent 25 consecutive login requests via script.  
+Requests 21 onwards returned HTTP 429 — Too Many Requests.
+
+**Access Control**  
+Attempted to access `/api/bookings/admin/all` as a regular user session.  
+Returned HTTP 403 Forbidden.
+
+---
+
+## Security Improvements Summary
+
+- Replaced plaintext password storage with bcrypt hashing
+- Moved from no session expiry to a 2-hour rolling session with secure cookie flags
+- Added validation middleware layer between routes and controllers
+- Added schema-level constraints as a secondary enforcement layer in Mongoose
+- Configured helmet.js for full HTTP security header coverage
+- Applied rate limiting to authentication endpoints
+- Implemented global error handler that suppresses stack traces in production
+
+---
+
+## References
+
+- OWASP (2021) *OWASP Top Ten*. Available at: https://owasp.org/www-project-top-ten/
+- OWASP (2023) *Password Storage Cheat Sheet*. Available at: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+- Helmetjs (2024) *Helmet documentation*. Available at: https://helmetjs.github.io/
+- express-rate-limit (2024) Available at: https://express-rate-limit.mintlify.app/
