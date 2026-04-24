@@ -64,6 +64,68 @@ added after the fact.
 ---
 
 ## Project Structure
+x-hausted-autos/
+│
+├── backend/
+│   ├── config/
+│   │   └── db.js                  # MongoDB connection
+│   │
+│   ├── controllers/
+│   │   ├── authController.js      # Register, login, logout, user management
+│   │   ├── bookingController.js   # Booking CRUD logic
+│   │   └── serviceController.js   # Service CRUD logic
+│   │
+│   ├── middleware/
+│   │   ├── authMiddleware.js      # isAuthenticated, isAdmin checks
+│   │   └── validators.js          # express-validator chains for all routes
+│   │
+│   ├── models/
+│   │   ├── Booking.js             # Booking schema with enum and length constraints
+│   │   ├── Service.js             # Service schema
+│   │   └── User.js                # User schema with role enum
+│   │
+│   ├── routes/
+│   │   ├── authRoutes.js          # Auth and user management endpoints
+│   │   ├── bookingRoutes.js       # Booking endpoints (user + admin)
+│   │   └── serviceRoutes.js       # Service endpoints
+│   │
+│   ├── scripts/
+│   │   └── makeAdmin.js           # Utility to promote a user to admin role
+│   │
+│   ├── .env                       # Environment variables (not committed)
+│   ├── package.json
+│   └── server.js                  # App entry point, middleware config
+│
+├── frontend/
+│   ├── public/
+│   │
+│   └── src/
+│       ├── api/
+│       │   └── api.js             # Axios instance with credentials
+│       │
+│       ├── assets/images/services/
+│       │   └── *.jpg              # Service images
+│       │
+│       ├── components/            # Reusable UI components
+│       │
+│       ├── context/
+│       │   └── AuthContext.js     # Global auth state management
+│       │
+│       ├── data/
+│       │   └── cars.js            # Static car data
+│       │
+│       ├── pages/
+│       │   ├── AdminDashboard.js  # Admin management interface
+│       │   ├── Bookings.js        # User bookings view
+│       │   ├── home.js            # Landing page
+│       │   ├── login.js           # Login page
+│       │   └── register.js        # Registration page
+│       │
+│       ├── App.js
+│       └── index.js
+│
+├── .gitignore
+└── README.md
 
 
 
