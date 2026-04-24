@@ -12,6 +12,7 @@ const {
 } = require("../controllers/authController");
 
 const { isAuthenticated, isAdmin } = require("../middleware/authMiddleware");
+const { validateRegister, validateLogin } = require("../middleware/validators");
 
 // USER REGISTRATION
 router.post("/register", register);
