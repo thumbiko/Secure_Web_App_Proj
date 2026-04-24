@@ -64,65 +64,67 @@ added after the fact.
 ---
 
 ## Project Structure
+
+
 ## Project Structure
 
 ```
 x-hausted-autos/
 ├── backend/
 │   ├── config/
-│   │   └── db.js
+│   │   └── db.js                       # Establishes and exports the MongoDB connection
 │   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── bookingController.js
-│   │   └── serviceController.js
+│   │   ├── authController.js           # Handles register, login, logout, and user management logic
+│   │   ├── bookingController.js        # Handles all booking creation, retrieval, update, and deletion logic
+│   │   └── serviceController.js        # Handles service CRUD logic for admin management
 │   ├── middleware/
-│   │   ├── authMiddleware.js
-│   │   └── validators.js
+│   │   ├── authMiddleware.js           # isAuthenticated and isAdmin checks applied to protected routes
+│   │   └── validators.js              # express-validator chains for register, login, booking, and status inputs
 │   ├── models/
-│   │   ├── Booking.js
-│   │   ├── Service.js
-│   │   └── User.js
+│   │   ├── Booking.js                  # Mongoose schema for bookings with enum and length constraints
+│   │   ├── Service.js                  # Mongoose schema for available services
+│   │   └── User.js                     # Mongoose schema for users with role enum (user, admin)
 │   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── bookingRoutes.js
-│   │   └── serviceRoutes.js
+│   │   ├── authRoutes.js               # Endpoints for registration, login, logout, and user management
+│   │   ├── bookingRoutes.js            # Endpoints for user and admin booking operations
+│   │   └── serviceRoutes.js            # Endpoints for service management
 │   ├── scripts/
-│   │   └── makeAdmin.js
-│   ├── .env
-│   ├── package.json
-│   └── server.js
+│   │   └── makeAdmin.js                # Utility script to promote a registered user to admin role
+│   ├── .env                            # Environment variables — Mongo URI, session secret, port (not committed)
+│   ├── package.json                    # Backend dependencies and scripts
+│   └── server.js                       # App entry point — middleware config, route mounting, error handler
 │
 ├── frontend/
-│   ├── public/
+│   ├── public/                         # Static public assets served directly by React
 │   └── src/
 │       ├── api/
-│       │   └── api.js
+│       │   └── api.js                  # Axios instance configured with base URL and credentials for session cookies
 │       ├── assets/
 │       │   └── images/
 │       │       └── services/
-│       │           ├── ambient.jpg
-│       │           ├── carplay.jpg
-│       │           ├── diagnostics.jpg
-│       │           ├── mods.jpg
-│       │           ├── starlight.jpg
-│       │           └── valet.jpg
-│       ├── components/
+│       │           ├── ambient.jpg     # Image for ambient lighting service card
+│       │           ├── carplay.jpg     # Image for CarPlay kit service card
+│       │           ├── diagnostics.jpg # Image for diagnostics service card
+│       │           ├── mods.jpg        # Image for general modification service card
+│       │           ├── starlight.jpg   # Image for starlight ceiling service card
+│       │           └── valet.jpg       # Image for valet service card
+│       ├── components/                 # Reusable UI components shared across pages
 │       ├── context/
-│       │   └── AuthContext.js
+│       │   └── AuthContext.js          # Global authentication state — stores logged in user and role
 │       ├── data/
-│       │   └── cars.js
+│       │   └── cars.js                 # Static list of car makes and models used in the booking form
 │       ├── pages/
-│       │   ├── AdminDashboard.js
-│       │   ├── Bookings.js
-│       │   ├── home.js
-│       │   ├── login.js
-│       │   └── register.js
-│       ├── App.css
-│       ├── App.js
-│       └── index.js
+│       │   ├── AdminDashboard.js       # Admin interface for managing bookings, services, and users
+│       │   ├── Bookings.js             # User-facing page to view and cancel personal bookings
+│       │   ├── home.js                 # Landing page displaying available services
+│       │   ├── login.js                # Login form with session-based authentication
+│       │   └── register.js             # Registration form with client-side validation
+│       ├── App.css                     # Global application styles
+│       ├── App.js                      # Root component — defines routes and page layout
+│       └── index.js                    # React entry point — renders App into the DOM
 │
-├── .gitignore
-└── README.md
+├── .gitignore                          # Specifies files excluded from version control (node_modules, .env)
+└── README.md                           # Project documentation, setup instructions, and security summary
 ```
 
 
